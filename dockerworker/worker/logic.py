@@ -52,6 +52,7 @@ def create_containers(job, in_dir, out_dir):
             volumes=volumes,
             detach=True,
             name=tag,
+            mem_limit="{}m".format(job.descriptor['max_memoryMB']),
         )
         mounted_ids.append(c_id)
 
