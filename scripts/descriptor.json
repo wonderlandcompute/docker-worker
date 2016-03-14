@@ -1,0 +1,12 @@
+{
+    "name" : "SHiP MC Thomas March",
+    "env_container" : {
+        "workdir" : "",
+        "name" : "scr4t/ship:01.03.2016"
+    },
+    "output_uri" : "eos:/eos/ship/skygrid/$JOB_ID",
+    "cmd": "/bin/bash -l -c 'source /opt/FairShipRun/config.sh; export PYTHONPATH+=:/opt/FairShipRun/python; python /opt/FairShip/muonShieldOptimization/g4Ex_gap.py --ecut 10 --num-events 100000 --output /output'",
+    "cpu_per_container" : 1,
+    "max_memoryMB" : 1024,
+    "min_memoryMB" : 512
+}

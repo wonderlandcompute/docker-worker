@@ -63,8 +63,7 @@ def main():
 
     job = JobPH(
         descriptor=descriptor,
-        #input=["git:https://github.com/PashaPodolsky/PyBayCor"],
-        input=["dcache:/users/sashab1/ship-dec2015/inputs/genie-nu_mu_bar.root"]
+        input=[],
     )
     job.job_id = "job_{}".format(time())
 
