@@ -65,7 +65,8 @@ def create_containers(job, in_dir, out_dir):
 
     entrypoint = job.descriptor['env_container'].get('entrypoint') or ''
     extra_flags = job.descriptor['env_container'].get('extra_flags') or []
-    volumes_list, volumes_binds = util.obtain_volumes(in_dir, out_dir, extra_flags)
+    needed_volumes = job.descriptor['env_container'].get('volumes') or []
+    volumes_list = util.obtain_volumes(in_dir, out_dir, needed_volumes)
 
     main_id = harbor.create_container(
         job.descriptor['env_container']['name'],
@@ -79,7 +80,7 @@ def create_containers(job, in_dir, out_dir):
     harbor.start_container(
         main_id,
         volumes_from=mounted_names,
-        binds=volumes_binds
+        binds=volumes_list
     )
 
     return mounted_ids, main_id
