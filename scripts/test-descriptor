@@ -68,6 +68,7 @@ def main():
     job.job_id = "job_{}".format(time())
 
     do_docker_job(job)
+    print job.output
 
 
 if __name__ == '__main__':

@@ -54,10 +54,10 @@ def process(job):
             time.sleep(config.CONTAINER_CHECK_INTERVAL)
 
         logic.write_std_output(container_id, out_dir)
-
-        logic.upload_output_files(job, out_dir)
+        logic.handle_output(job, out_dir)
     except Exception, e:
         capture_exception()
+        traceback.print_exc()
         raise e
     finally:
         logic.cleanup_dir(job_dir)

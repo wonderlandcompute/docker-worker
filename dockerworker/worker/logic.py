@@ -25,18 +25,18 @@ def create_workdir(job):
 
 
 def get_input_files(job, in_dir):
-    for input_file in job.input:
+    for input_file in job.descriptor['input']:
         logger.debug("Download input {}".format(input_file))
         config.backend.copy_from_backend(input_file, in_dir)
 
+
 def create_containers(job, in_dir, out_dir):
     # Add needed containers
-    needed = job.descriptor['env_container'].get('needed_containers') or []
-
     logger.debug("Creating containers")
 
     mounted_ids = []
     mounted_names = []
+    needed = job.descriptor['container'].get('needed_containers', [])
     for i, container in enumerate(needed):
         image, volumes = container['name'], container['volumes']
         assert isinstance(volumes, list)
@@ -58,19 +58,19 @@ def create_containers(job, in_dir, out_dir):
 
     # Execute environment container
     if not config.ONLY_LOCAL_IMAGES:
-        harbor.pull_image(job.descriptor['env_container']['name'])
+        harbor.pull_image(job.descriptor['container']['name'])
 
     command = util.build_command(job)
     logger.debug('Command to execute: {}'.format(command))
 
-    entrypoint = job.descriptor['env_container'].get('entrypoint') or ''
-    extra_flags = job.descriptor['env_container'].get('extra_flags') or []
-    needed_volumes = job.descriptor['env_container'].get('volumes') or []
+    entrypoint = job.descriptor['container'].get('entrypoint', '')
+    extra_flags = job.descriptor['container'].get('extra_flags', [])
+    needed_volumes = job.descriptor['container'].get('volumes', [])
     volumes_list = util.obtain_volumes(in_dir, out_dir, needed_volumes)
 
     main_id = harbor.create_container(
-        job.descriptor['env_container']['name'],
-        working_dir=job.descriptor['env_container']['workdir'],
+        job.descriptor['container']['name'],
+        working_dir=job.descriptor['container']['workdir'],
         command=command,
         entrypoint=entrypoint,
         volumes=volumes_list,
@@ -96,14 +96,35 @@ def write_std_output(container_id, out_dir):
             stderr_f.write(logline)
 
 
-def upload_output_files(job, out_dir):
-    upload_uri = job.descriptor.get('output_uri') # should contain $JOB_ID
-    upload_uri = upload_uri.replace('$JOB_ID', job.job_id)
-
+def upload_output_files(out_dir, upload_uri):
     logger.debug("Upload output directory `{}` to `{}`".format(out_dir, upload_uri))
     config.backend.copy_to_backend(out_dir, upload_uri)
+    return config.backend.list_uploaded(upload_uri)
 
-    job.update_output(config.backend.list_uploaded(upload_uri))
+
+def obtain_output_variables(variables, out_dir):
+    ret = []
+    for var in variables:
+        filepath = os.path.join(out_dir, var['file'])
+        with open(filepath) as fp:
+            value = fp.read().strip()
+
+        ret.append("variable:{}={}".format(var['to_variable'], value))
+
+    return ret
+
+
+
+def handle_output(job, out_dir):
+    required_outputs = job.descriptor.get('required_outputs', {})
+    upload_uri = required_outputs.get('output_uri', '')
+    upload_uri = upload_uri.replace('$JOB_ID', job.job_id)
+    uploaded_files = upload_output_files(out_dir, upload_uri)
+
+    file_contents_variables = required_outputs.get("file_contents", [])
+    variables = obtain_output_variables(file_contents_variables, out_dir)
+
+    job.update_output(uploaded_files + variables)
 
 
 def pre_remove_hook():
