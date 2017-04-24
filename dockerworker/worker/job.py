@@ -18,7 +18,6 @@ def do_docker_job(job):
     try:
         job.update_status("running")
         process(job)
-        job.update_status("completed")
         logger.debug("Finished")
     except BaseException, e:
         capture_exception()
@@ -55,6 +54,8 @@ def process(job):
 
         logic.write_std_output(container_id, out_dir)
         logic.handle_output(job, out_dir)
+        logging.debug("Setting job.status='completed'")
+        job.update_status("completed")
     except Exception, e:
         capture_exception()
         traceback.print_exc()
@@ -66,5 +67,4 @@ def process(job):
         if container_id:
             cnt_to_remove += [container_id]
 
-        with LockFile(config.LOCK_FILE):
-            logic.cleanup_containers(cnt_to_remove)
+        logic.cleanup_containers(cnt_to_remove)
