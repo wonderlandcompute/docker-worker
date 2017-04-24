@@ -21,7 +21,8 @@ def do_docker_job(job):
         logger.debug("Finished")
     except BaseException, e:
         capture_exception()
-        job.update_status("failed")
+        if job.status != "completed":
+            job.update_status("failed")
 
         if config.DEBUG:
             job.update_debug({
