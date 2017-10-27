@@ -1,24 +1,23 @@
 #!/usr/bin/env python
 
-import sys
 import json
 import signal
+import sys
 from time import time
-
 from lockfile import LockFile
 
 from dockerworker.config import config
 from dockerworker.worker import do_docker_job
 
+
 class JobPH(object):
     """Phony job class"""
-    def __init__(self, status='', descriptor={}, input=[], output=[]):
-        self.status = status
-        self.descriptor = descriptor
-        self.input = input
-        self.output = output
-        self._debug = {}
 
+    def __init__(self, status='', descriptor=None, output=None):
+        self.input = descriptor
+        self.id = None
+        self.status = status
+        self.output = output
 
     def update_status(self, status):
         self.status = status
@@ -28,18 +27,14 @@ class JobPH(object):
         self.output = output
         return {u'success': True, u'updated_output': output}
 
-    def update_debug(self, debug):
-        self._debug = debug
-        return {u'debug': debug}
-
     def delete(self):
         return None
 
     def json(self):
         return json.dumps({
-            'job_id': self.job_id,
+            'job_id': self.id,
             'status': self.status,
-            'descriptor': self.descriptor
+            'descriptor': self.input
         })
 
 
@@ -49,23 +44,22 @@ def break_lock():
     except:
         pass
 
+
 def sigquit_handler(n, f):
-    kill_all_containers()
+    # kill_all_containers()
     break_lock()
     sys.exit(0)
+
 
 def main():
     break_lock()
     signal.signal(signal.SIGQUIT, sigquit_handler)
     assert len(sys.argv) == 2, "input file is needed"
-    descriptor =  json.loads(open(sys.argv[1]).read())
 
+    job = JobPH()
+    job.id = "job_{}".format(time())
 
-    job = JobPH(
-        descriptor=descriptor,
-        input=[],
-    )
-    job.job_id = "job_{}".format(time())
+    job.input=json.dumps(json.loads(open(sys.argv[1]).read()))
 
     do_docker_job(job)
     print job.output

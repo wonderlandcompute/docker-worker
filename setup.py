@@ -11,7 +11,6 @@ setup(
     install_requires=[
         "lockfile==0.10.2",
         "requests>=2.5.1",
-        "skygrid-libscheduler>=0.5.7",
         "docker-py>=1.1.0",
         "six==1.9.0",
         "websocket-client>=0.26.0",
@@ -19,8 +18,9 @@ setup(
         "raven",
         "hep-data-backends",
         "marshmallow",
+        "disneylandClient"
     ],
     scripts = [
-        'scripts/test-descriptor'
+        'scripts/test-descriptor.py'
     ]
 )

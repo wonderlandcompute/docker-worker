@@ -1,21 +1,21 @@
+import json
 import os
 import shutil
 
-import util
 import harbor
-
-from ..config import config
-from ..log import logger
+import util
+from dockerworker.config import config
+from dockerworker.log import logger
 
 
 def create_workdir(job):
-    job_workdir = os.path.join(config.WORK_DIR, job.job_id)
+    job_workdir = os.path.join(config.WORK_DIR, str(job.id))
     if os.path.isdir(job_workdir):
         shutil.rmtree(job_workdir)
 
     os.mkdir(job_workdir)
 
-    input_dir  = os.path.join(job_workdir, "input")
+    input_dir = os.path.join(job_workdir, "input")
     os.mkdir(input_dir)
 
     output_dir = os.path.join(job_workdir, "output")
@@ -25,7 +25,8 @@ def create_workdir(job):
 
 
 def get_input_files(job, in_dir):
-    for input_file in job.descriptor['input']:
+    descriptor = json.loads(job.input)
+    for input_file in descriptor['input']:
         logger.debug("Download input {}".format(input_file))
         config.backend.copy_from_backend(input_file, in_dir)
 
@@ -33,10 +34,11 @@ def get_input_files(job, in_dir):
 def create_containers(job, in_dir, out_dir):
     # Add needed containers
     logger.debug("Creating containers")
+    descriptor = json.loads(job.input)
 
     mounted_ids = []
     mounted_names = []
-    needed = job.descriptor['container'].get('needed_containers', [])
+    needed = descriptor['container'].get('needed_containers', [])
     for i, container in enumerate(needed):
         image, volumes = container['name'], container['volumes']
         assert isinstance(volumes, list)
@@ -44,7 +46,7 @@ def create_containers(job, in_dir, out_dir):
         if not config.ONLY_LOCAL_IMAGES:
             harbor.pull_image(image)
 
-        tag = "JOB-{}-CNT-{}".format(job.job_id, i)
+        tag = "JOB-{}-CNT-{}".format(job.id, i)
         mounted_names.append(tag)
 
         c_id = harbor.create_container(
@@ -52,25 +54,25 @@ def create_containers(job, in_dir, out_dir):
             volumes=volumes,
             detach=True,
             name=tag,
-            mem_limit="{}m".format(job.descriptor['max_memoryMB']),
+            mem_limit="{}m".format(descriptor['max_memoryMB']),
         )
         mounted_ids.append(c_id)
 
     # Execute environment container
     if not config.ONLY_LOCAL_IMAGES:
-        harbor.pull_image(job.descriptor['container']['name'])
+        harbor.pull_image(descriptor['container']['name'])
 
     command = util.build_command(job)
     logger.debug('Command to execute: {}'.format(command))
 
-    entrypoint = job.descriptor['container'].get('entrypoint', '')
-    extra_flags = job.descriptor['container'].get('extra_flags', [])
-    needed_volumes = job.descriptor['container'].get('volumes', [])
+    entrypoint = descriptor['container'].get('entrypoint', '')
+    extra_flags = descriptor['container'].get('extra_flags', [])
+    needed_volumes = descriptor['container'].get('volumes', [])
     volumes_list = util.obtain_volumes(in_dir, out_dir, needed_volumes)
 
     main_id = harbor.create_container(
-        job.descriptor['container']['name'],
-        working_dir=job.descriptor['container']['workdir'],
+        descriptor['container']['name'],
+        working_dir=descriptor['container']['workdir'],
         command=command,
         entrypoint=entrypoint,
         volumes=volumes_list,
@@ -114,17 +116,17 @@ def obtain_output_variables(variables, out_dir):
     return ret
 
 
-
 def handle_output(job, out_dir):
-    required_outputs = job.descriptor.get('required_outputs', {})
+    descriptor = json.loads(job.input)
+    required_outputs = descriptor.get('required_outputs', {})
     upload_uri = required_outputs.get('output_uri', '')
-    upload_uri = upload_uri.replace('$JOB_ID', job.job_id)
+    upload_uri = upload_uri.replace('$JOB_ID', str(job.id))
     uploaded_files = upload_output_files(out_dir, upload_uri)
 
     file_contents_variables = required_outputs.get("file_contents", [])
     variables = obtain_output_variables(file_contents_variables, out_dir)
 
-    job.update_output(uploaded_files + variables)
+    job.output = (str(uploaded_files) + str(variables))
 
 
 def pre_remove_hook():

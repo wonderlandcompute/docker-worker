@@ -1,4 +1,5 @@
 import time
+import json
 from marshmallow import Schema, fields
 
 class ContainerSchema(Schema):
@@ -33,11 +34,12 @@ def multiple_replace(text, word_dict):
 
 
 def build_command(job):
-    command = job.descriptor['container']['cmd']
+    descriptor=json.loads(job.input)
+    command = descriptor['container']['cmd']
     command = multiple_replace(command, {
         "$OUTPUT_DIR": "/output",
         "$INPUT_DIR": "/input",
-        "$JOB_ID": job.job_id,
+        "$JOB_ID": job.id,
         "$TIMESTAMP": time.time()
     })
 
@@ -45,7 +47,7 @@ def build_command(job):
 
 
 def descriptor_correct(job):
-    errors = descriptor_schema.validate(job.descriptor)
+    errors = descriptor_schema.validate(json.loads(job.input))
     assert not errors, "Descriptor incorrect: " + str(errors)
 
 

@@ -6,8 +6,8 @@ from docker import Client
 
 from lockfile import LockFile
 
-from ..log import logger, capture_exception
-from ..config import config
+from dockerworker.log import logger, capture_exception
+from dockerworker.config import config
 
 
 
