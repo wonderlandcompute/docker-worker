@@ -18,9 +18,11 @@ setup(
         "raven",
         "hep-data-backends",
         "marshmallow",
-        "disneylandClient"
+        "disneylandClient",
+        "protobuf",
+        "json"
     ],
-    scripts = [
+    scripts=[
         'scripts/test-descriptor.py'
     ]
 )
