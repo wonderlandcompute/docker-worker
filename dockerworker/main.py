@@ -1,8 +1,8 @@
 import signal
 import sys
 
+from disneylandClient import Worker, new_client
 from lockfile import LockFile
-from disneylandClient import Worker,new_client
 
 from config import config
 from log import logger, capture_exception

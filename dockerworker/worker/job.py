@@ -1,9 +1,9 @@
-import json
 import socket
 import time
 import traceback
 
 from disneylandClient import Job
+from google.protobuf.json_format import MessageToJson
 from lockfile import LockFile
 
 import harbor
@@ -11,7 +11,6 @@ import logic
 import util
 from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
-from google.protobuf.json_format import MessageToJson
 
 
 def do_docker_job(job, val):

@@ -1,6 +1,8 @@
-import time
 import json
+import time
+
 from marshmallow import Schema, fields
+
 
 class ContainerSchema(Schema):
     workdir = fields.String()
@@ -10,13 +12,16 @@ class ContainerSchema(Schema):
     min_memoryMB = fields.Int()
     cmd = fields.String()
 
+
 class FileContentVariableSchema(Schema):
     file = fields.String()
     to_variable = fields.String()
 
+
 class RequiredOutputsSchema(Schema):
     output_uri = fields.String(required=True)
-    file_contents  = fields.Nested(FileContentVariableSchema, many=True)
+    file_contents = fields.Nested(FileContentVariableSchema, many=True)
+
 
 class JobDescriptorSchema(Schema):
     input = fields.List(fields.String())
@@ -34,7 +39,7 @@ def multiple_replace(text, word_dict):
 
 
 def build_command(job):
-    descriptor=json.loads(job.input)
+    descriptor = json.loads(job.input)
     command = descriptor['container']['cmd']
     command = multiple_replace(command, {
         "$OUTPUT_DIR": "/output",

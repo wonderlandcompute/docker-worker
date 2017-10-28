@@ -1,15 +1,7 @@
-import os
-import re
-
-import docker
 from docker import Client
 
-from lockfile import LockFile
-
-from dockerworker.log import logger, capture_exception
 from dockerworker.config import config
-
-
+from dockerworker.log import logger, capture_exception
 
 client = Client(base_url=config.DOCKER_URL, version=config.DOCKER_API_VERSION, timeout=config.DOCKER_TIMEOUT)
 

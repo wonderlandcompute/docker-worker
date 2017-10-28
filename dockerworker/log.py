@@ -1,7 +1,10 @@
-import sys
 import logging
-from config import config
+import sys
+
 from raven import Client
+
+from config import config
+
 
 def default_logger():
     logger = logging.getLogger("default")
@@ -14,8 +17,8 @@ def default_logger():
         handler.setFormatter(formatter)
     return logger
 
-logger = default_logger()
 
+logger = default_logger()
 
 sentry_client = None
 capture_exception = lambda: None
