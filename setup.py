@@ -23,6 +23,6 @@ setup(
         "json"
     ],
     scripts=[
-        'scripts/test-descriptor.py'
+        'scripts/test-descriptor'
     ]
 )
