@@ -11,16 +11,16 @@ import logic
 import util
 from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
+from google.protobuf.json_format import MessageToJson
 
 
-def do_docker_job(job):
-    job.input=json.dumps(json.loads(open("/Users/macbook/docker-worker/scripts/descriptor.json").read()))
-
+def do_docker_job(job, val):
     logger.debug("Got descriptor: {}".format(job.input))
     try:
         job.status = Job.RUNNING
         process(job)
         logger.debug("Finished")
+        val.put(MessageToJson(job))
     except BaseException, e:
         capture_exception()
         if job.status != Job.COMPLETED:
