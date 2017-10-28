@@ -3,39 +3,15 @@
 import json
 import signal
 import sys
+from multiprocessing import Queue
 from time import time
+
+from disneylandClient import Job
+from google.protobuf.json_format import Parse
 from lockfile import LockFile
 
 from dockerworker.config import config
 from dockerworker.worker import do_docker_job
-
-
-class JobPH(object):
-    """Phony job class"""
-
-    def __init__(self, status='', descriptor=None, output=None):
-        self.input = descriptor
-        self.id = None
-        self.status = status
-        self.output = output
-
-    def update_status(self, status):
-        self.status = status
-        return {u'success': True, u'updated_status': status}
-
-    def update_output(self, output):
-        self.output = output
-        return {u'success': True, u'updated_output': output}
-
-    def delete(self):
-        return None
-
-    def json(self):
-        return json.dumps({
-            'job_id': self.id,
-            'status': self.status,
-            'descriptor': self.input
-        })
 
 
 def break_lock():
@@ -55,14 +31,15 @@ def main():
     break_lock()
     signal.signal(signal.SIGQUIT, sigquit_handler)
     assert len(sys.argv) == 2, "input file is needed"
+    queue = Queue()
+    job = Job()
+    job.id = 2
 
-    job = JobPH()
-    job.id = "job_{}".format(time())
+    job.input = json.dumps(json.loads(open(sys.argv[1]).read()))
 
-    job.input=json.dumps(json.loads(open(sys.argv[1]).read()))
-
-    do_docker_job(job)
-    print job.output
+    do_docker_job(job, queue)
+    Parse(queue.get(), job)
+    print job
 
 
 if __name__ == '__main__':
