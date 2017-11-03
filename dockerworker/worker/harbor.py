@@ -29,7 +29,7 @@ def start_container(container_id, **kwargs):
         try:
             client.start(container_id, **kwargs)
             break
-        except Exception, e:
+        except Exception as e:
             capture_exception()
             logger.debug("Failed to start container id={}, error: {}".format(container_id, e))
             attempts += 1
