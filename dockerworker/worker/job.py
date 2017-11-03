@@ -2,25 +2,29 @@ import socket
 import time
 import traceback
 
-from disneylandClient import Job
-from google.protobuf.json_format import MessageToJson
+from disneylandClient import Job, new_client
 from lockfile import LockFile
 
-import harbor
-import logic
-import util
+from . import harbor
+from . import logic
+from . import util
 from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
 
 
-def do_docker_job(job, val):
+def do_docker_job(job, stub):
     logger.debug("Got descriptor: {}".format(job.input))
     try:
         job.status = Job.RUNNING
+        stub.ModifyJob(job)
+
         process(job)
+
+        job.status = Job.COMPLETED
+        stub.ModifyJob(job)
+
         logger.debug("Finished")
-        val.put(MessageToJson(job))
-    except BaseException, e:
+    except BaseException as e:
         capture_exception()
         if job.status != Job.COMPLETED:
             job.status = Job.FAILED
@@ -58,7 +62,7 @@ def process(job):
         logic.handle_output(job, out_dir)
         logger.debug("Setting job.status='completed'")
         job.status = Job.COMPLETED
-    except Exception, e:
+    except Exception as e:
         capture_exception()
         traceback.print_exc()
         raise e

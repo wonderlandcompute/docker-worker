@@ -2,8 +2,8 @@ import json
 import os
 import shutil
 
-import harbor
-import util
+from . import harbor
+from . import util
 from dockerworker.config import config
 from dockerworker.log import logger
 
@@ -126,7 +126,7 @@ def handle_output(job, out_dir):
     file_contents_variables = required_outputs.get("file_contents", [])
     variables = obtain_output_variables(file_contents_variables, out_dir)
 
-    job.output = (str(uploaded_files) + str(variables))
+    job.output = json.dumps(uploaded_files + variables)
 
 
 def pre_remove_hook():

@@ -4,10 +4,9 @@ import sys
 from disneylandClient import Worker, new_client
 from lockfile import LockFile
 
-from config import config
-from log import logger, capture_exception
-from worker import do_docker_job
-from worker.harbor import REMOVE_ALL_CONTAINERS
+from .config import config
+from .log import logger, capture_exception
+from .worker import do_docker_job
 
 
 def break_lock():
@@ -24,13 +23,6 @@ def sigquit_handler(n, f, worker):
         capture_exception()
         pass
 
-    if config.DOCKER_KILLALL:
-        try:
-            REMOVE_ALL_CONTAINERS()
-        except:
-            capture_exception()
-            pass
-
     try:
         break_lock()
     except:
@@ -41,8 +33,6 @@ def sigquit_handler(n, f, worker):
 
 def main():
     break_lock()
-    if config.DOCKER_KILLALL:
-        REMOVE_ALL_CONTAINERS()
 
     worker = Worker(
         new_client(),

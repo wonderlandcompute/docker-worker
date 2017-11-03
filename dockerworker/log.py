@@ -3,7 +3,7 @@ import sys
 
 from raven import Client
 
-from config import config
+from .config import config
 
 
 def default_logger():
