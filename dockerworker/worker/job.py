@@ -1,31 +1,36 @@
-import os
 import socket
 import time
 import traceback
 
-import harbor
-
-import util
-import logic
-
-from ..config import config
-from ..log import logger, capture_exception
-
+from disneylandClient import Job, new_client
 from lockfile import LockFile
 
-def do_docker_job(job):
-    logger.debug("Got descriptor: {}".format(job.descriptor))
+from . import harbor
+from . import logic
+from . import util
+from dockerworker.config import config
+from dockerworker.log import logger, capture_exception
+
+
+def do_docker_job(job, stub):
+    logger.debug("Got descriptor: {}".format(job.input))
     try:
-        job.update_status("running")
+        job.status = Job.RUNNING
+        stub.ModifyJob(job)
+
         process(job)
+
+        job.status = Job.COMPLETED
+        stub.ModifyJob(job)
+
         logger.debug("Finished")
-    except BaseException, e:
+    except BaseException as e:
         capture_exception()
-        if job.status != "completed":
-            job.update_status("failed")
+        if job.status != Job.COMPLETED:
+            job.status = Job.FAILED
 
         if config.DEBUG:
-            job.update_debug({
+            logger.debug({
                 "hostname": socket.gethostname(),
                 "exception": str(e),
                 "traceback": traceback.format_exc()
@@ -55,9 +60,9 @@ def process(job):
 
         logic.write_std_output(container_id, out_dir)
         logic.handle_output(job, out_dir)
-        logging.debug("Setting job.status='completed'")
-        job.update_status("completed")
-    except Exception, e:
+        logger.debug("Setting job.status='completed'")
+        job.status = Job.COMPLETED
+    except Exception as e:
         capture_exception()
         traceback.print_exc()
         raise e

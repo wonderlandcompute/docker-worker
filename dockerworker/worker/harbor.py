@@ -1,15 +1,7 @@
-import os
-import re
-
-import docker
 from docker import Client
 
-from lockfile import LockFile
-
-from ..log import logger, capture_exception
-from ..config import config
-
-
+from dockerworker.config import config
+from dockerworker.log import logger, capture_exception
 
 client = Client(base_url=config.DOCKER_URL, version=config.DOCKER_API_VERSION, timeout=config.DOCKER_TIMEOUT)
 
@@ -37,7 +29,7 @@ def start_container(container_id, **kwargs):
         try:
             client.start(container_id, **kwargs)
             break
-        except Exception, e:
+        except Exception as e:
             capture_exception()
             logger.debug("Failed to start container id={}, error: {}".format(container_id, e))
             attempts += 1

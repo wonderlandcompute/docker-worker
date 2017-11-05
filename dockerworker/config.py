@@ -1,5 +1,5 @@
-import os
 import imp
+import os
 
 conf_file = os.environ.get('DOCKER_WORKER_CONFIG')
 
@@ -11,7 +11,7 @@ config.__file__ = conf_file
 
 try:
     with open(conf_file) as config_file:
-        exec(compile(config_file.read(), conf_file, 'exec'), config.__dict__)
+        exec (compile(config_file.read(), conf_file, 'exec'), config.__dict__)
 except IOError as e:
     e.strerror = 'Unable to load configuration file (%s)' % e.strerror
     raise
