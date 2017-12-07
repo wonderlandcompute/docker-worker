@@ -89,11 +89,11 @@ def create_containers(job, in_dir, out_dir):
 
 
 def write_std_output(container_id, out_dir):
-    with open(os.path.join(out_dir, "stdout"), "w") as stdout_f:
+    with open(os.path.join(out_dir, "stdout"), "wb") as stdout_f:
         for logline in harbor.logs(container_id, stdout=True, stderr=False, stream=True):
-            stdout_f.write(logline)
+                stdout_f.write(logline)
 
-    with open(os.path.join(out_dir, "stderr"), "w") as stderr_f:
+    with open(os.path.join(out_dir, "stderr"), "wb") as stderr_f:
         for logline in harbor.logs(container_id, stdout=False, stderr=True, stream=True):
             stderr_f.write(logline)
 
