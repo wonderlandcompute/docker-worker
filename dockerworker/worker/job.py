@@ -13,7 +13,7 @@ from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
 
 
-def do_docker_job(job, stub):
+def do_docker_job(job, stub, completion_event):
     logger.debug("Got descriptor: {}".format(job.input))
     try:
         job.status = Job.RUNNING
@@ -23,6 +23,7 @@ def do_docker_job(job, stub):
 
         job.status = Job.COMPLETED
         stub.ModifyJob(job)
+        completion_event.set()
 
         logger.debug("Finished")
     except BaseException as e:
@@ -41,6 +42,7 @@ def do_docker_job(job, stub):
 
         logger.error(str(e))
         logger.error(traceback.format_exc())
+        completion_event.set()
         raise e
 
 
