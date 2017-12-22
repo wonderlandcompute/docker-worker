@@ -3,7 +3,7 @@ import time
 import traceback
 
 import json
-from disneylandClient import Job
+from disneylandClient import Job, new_client
 from lockfile import LockFile
 
 from . import harbor
@@ -13,16 +13,20 @@ from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
 
 
-def do_docker_job(job, stub, completion_event):
+def do_docker_job(job, completion_event):
     logger.debug("Got descriptor: {}".format(job.input))
     try:
         job.status = Job.RUNNING
-        stub.ModifyJob(job)
+
+        stub = new_client()
+        stub.ModifyJob(job, timeout=5)
+        del stub
 
         process(job)
 
+        stub = new_client()
         job.status = Job.COMPLETED
-        stub.ModifyJob(job)
+        stub.ModifyJob(job, timeout=5)
         completion_event.set()
 
         logger.debug("Finished")
@@ -38,7 +42,9 @@ def do_docker_job(job, stub, completion_event):
         }
 
         job.metadata = json.dumps(debug_info)
-        stub.ModifyJob(job)
+
+        stub = new_client()
+        stub.ModifyJob(job, timeout=5)
 
         logger.error(str(e))
         logger.error(traceback.format_exc())
