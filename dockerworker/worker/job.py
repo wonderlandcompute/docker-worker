@@ -3,7 +3,7 @@ import time
 import traceback
 
 import json
-from disneylandClient import Job, new_client
+from wonderlandClient import Job, new_client
 from lockfile import LockFile
 
 from . import harbor

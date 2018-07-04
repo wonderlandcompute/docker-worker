@@ -6,7 +6,7 @@ import sys
 from multiprocessing import Queue
 from time import time
 
-from disneylandClient import Job
+from wonderlandClient import Job
 from google.protobuf.json_format import Parse
 from lockfile import LockFile
 
