@@ -3,7 +3,8 @@ from docker import Client
 from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
 
-client = Client(base_url=config.DOCKER_URL, version=config.DOCKER_API_VERSION, timeout=config.DOCKER_TIMEOUT)
+client = Client(base_url=config.DOCKER_URL,
+                version=config.DOCKER_API_VERSION, timeout=config.DOCKER_TIMEOUT)
 
 
 def pull_image(image, *args, **kwargs):
@@ -17,7 +18,8 @@ def is_running(containter_id):
 
 
 def create_container(image, **kwargs):
-    logger.debug("Creating container for image {} with arguments: {}".format(image, kwargs))
+    logger.debug(
+        "Creating container for image {} with arguments: {}".format(image, kwargs))
     c = client.create_container(image, **kwargs)
     return c['Id']
 
@@ -31,7 +33,8 @@ def start_container(container_id, **kwargs):
             break
         except Exception as e:
             capture_exception()
-            logger.debug("Failed to start container id={}, error: {}".format(container_id, e))
+            logger.debug(
+                "Failed to start container id={}, error: {}".format(container_id, e))
             attempts += 1
 
     if attempts < config.DOCKER_START_ATTEMPTS:
