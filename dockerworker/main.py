@@ -36,7 +36,7 @@ def main():
 
     worker = Worker(
         new_client(),
-        "docker",
+        "docker-test",
         do_docker_job,
         threads_num=config.THREADS_NUM,
         sleep_time=config.SLEEP_TIME,
