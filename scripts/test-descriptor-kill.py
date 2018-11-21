@@ -16,7 +16,7 @@ STATUS_IN_PROCESS = set([
 STATUS_FINAL = set([
     Job.COMPLETED,
     Job.FAILED,
-    # Job.KILLED,
+    Job.KILLED,
 ])
 
 
@@ -42,24 +42,11 @@ def main():
             output_ = job.output
 
             # kill
-            # TODO: stub.KillJob(RequestWithId(id=job.id)) without job =?
-            # TODO: ContinueJob?
             job = stub.KillJob(RequestWithId(id=job.id))
             assert job.status == Job.KILLED, f"job is not killed: {job.status}"
             assert input_ == job.input, "input is changed"
             assert output_ == job.output, "output is changed"
             print("[{}] Job :\n {}\n".format(time.time(), job))
-            print("job is killed.\nwait...")
-
-            # wait
-            time.sleep(5)
-
-            # continue
-            job.status = Job.PENDING
-            job = stub.CreateJob(job)
-            assert job.status in STATUS_IN_PROCESS, "job is not in progress"
-            print("...continue\n\n")
-
             killed = True
 
         time.sleep(3)
@@ -69,14 +56,10 @@ def main():
         if job.status in STATUS_FINAL:
             break
 
-    if job.status == Job.KILLED:
-        print("Job is killed!")
-
     if job.status == Job.FAILED:
         print("Job failed!")
 
     # print("result:", json.loads(job.output))
-
 
 if __name__ == '__main__':
     main()

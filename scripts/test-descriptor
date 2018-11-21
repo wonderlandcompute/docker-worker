@@ -18,6 +18,7 @@ STATUS_IN_PROCESS = set([
 STATUS_FINAL = set([
     Job.COMPLETED,
     Job.FAILED,
+    Job.KILLED
 ])
 
 
