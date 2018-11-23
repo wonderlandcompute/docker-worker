@@ -1,0 +1,1 @@
+{"input": [], "container": {"workdir": "", "name": "busybox:latest", "cpu_needed": 1, "max_memoryMB": 1024, "min_memoryMB": 512, "cmd": "sh -lc 'echo 123 > /output/test.txt'"}, "required_outputs": {"output_uri": "none:"}}

@@ -1,12 +1,12 @@
 import signal
 import sys
 
-from wonderlandClient import Worker, new_client
+from wonderlandClient import new_client
 from lockfile import LockFile
 
 from .config import config
 from .log import logger, capture_exception
-from .worker import do_docker_job
+from .worker import do_docker_job, Worker
 
 
 def break_lock():

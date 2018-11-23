@@ -1,3 +1,4 @@
+
 {
     "input": [
         "local:/tmp/file.txt"
@@ -19,4 +20,3 @@
             "to_variable": "a"
         }]
     }
-}

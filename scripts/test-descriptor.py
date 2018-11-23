@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import time
 import json
 import sys
@@ -18,7 +16,6 @@ STATUS_IN_PROCESS = set([
 STATUS_FINAL = set([
     Job.COMPLETED,
     Job.FAILED,
-    Job.KILLED
 ])
 
 
