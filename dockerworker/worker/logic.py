@@ -16,7 +16,8 @@ def create_workdir(job):
 
     os.mkdir(job_workdir)
 
-    input_dir = os.path.join(job_workdir, "input")
+    #input_dir = os.path.join(job_workdir, "input")
+    input_dir = os.path.join(config.WORK_DIR, "input")
     os.mkdir(input_dir)
 
     output_dir = os.path.join(job_workdir, "output")
@@ -29,7 +30,7 @@ def get_input_files(job, in_dir):
     descriptor = json.loads(job.input)
     for input_file in descriptor['input']:
         uri = urlparse(input_file)
-        if not os.path.exists(uri.path):
+        if not os.path.exists(os.path.join(in_dir, os.path.basename(uri.path))):
             logger.debug("File {} already exist !".format(uri.path))
         else:
             logger.debug("Download input {}".format(input_file))
