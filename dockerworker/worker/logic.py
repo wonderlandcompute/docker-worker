@@ -30,7 +30,7 @@ def get_input_files(job, in_dir):
     descriptor = json.loads(job.input)
     for input_file in descriptor['input']:
         uri = urlparse(input_file)
-        if not os.path.exists(os.path.join(in_dir, os.path.basename(uri.path))):
+        if os.path.exists(os.path.join(in_dir, os.path.basename(uri.path))):
             logger.debug("File {} already exist !".format(uri.path))
         else:
             logger.debug("Download input {}".format(input_file))
