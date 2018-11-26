@@ -6,6 +6,7 @@ from . import harbor
 from . import util
 from dockerworker.config import config
 from dockerworker.log import logger
+from urllib.parse import urlparse
 
 
 def create_workdir(job):
@@ -27,8 +28,12 @@ def create_workdir(job):
 def get_input_files(job, in_dir):
     descriptor = json.loads(job.input)
     for input_file in descriptor['input']:
-        logger.debug("Download input {}".format(input_file))
-        config.backend.copy_from_backend(input_file, in_dir)
+        uri = urlparse(input_file)
+        if not os.path.exists(uri.path):
+            logger.debug("File {} already exist !".format(uri.path))
+        else:
+            logger.debug("Download input {}".format(input_file))
+            config.backend.copy_from_backend(input_file, in_dir)
 
 
 def create_containers(job, in_dir, out_dir):
