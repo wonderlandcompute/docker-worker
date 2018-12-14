@@ -16,7 +16,6 @@ setup(
         "raven",
         "hep-data-backends",
         "marshmallow",
-        "disneylandClient",
         "protobuf",
     ],
     scripts=[

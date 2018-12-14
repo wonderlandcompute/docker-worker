@@ -18,10 +18,10 @@ def create_workdir(job):
 
     #input_dir = os.path.join(job_workdir, "input")
     input_dir = os.path.join(config.WORK_DIR, "input")
-    os.mkdir(input_dir)
+    os.makedirs(input_dir, exist_ok=True)
 
     output_dir = os.path.join(job_workdir, "output")
-    os.mkdir(output_dir)
+    os.makedirs(output_dir)
 
     return job_workdir, input_dir, output_dir
 

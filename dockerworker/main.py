@@ -1,7 +1,7 @@
 import signal
 import sys
 
-from disneylandClient import Worker, new_client
+from .worker import Worker, new_client
 from lockfile import LockFile
 
 from .config import config
