@@ -17,6 +17,11 @@ setup(
         "hep-data-backends",
         "marshmallow",
         "protobuf",
+        "yaml",
+        "grpc",
+        "PyYAML",
+        "grpcio",
+        "protobuf",
     ],
     scripts=[
         'scripts/test-descriptor'
