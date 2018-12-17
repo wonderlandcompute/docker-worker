@@ -12,7 +12,7 @@ setup(
         "lockfile",
         "requests>=2.5.1",
         "docker",
-        "six==1.9.0",
+        #"six",
         "raven",
         "hep-data-backends",
         "marshmallow",

@@ -4,6 +4,9 @@ from time import sleep
 from .util_connect import new_client
 from .wonderland_pb2 import Job, ListJobsRequest
 
+import os
+import logging
+
 class WorkerProcess:
     def __init__(self, job, job_func, args_list):
         self._finished = Event()
@@ -28,15 +31,17 @@ class Worker(object):
             stub,
             job_kind,
             job_func,
-            threads_num=2,
+            threads_num=16,
+            cpu_num=os.sysconf("SC_NPROCESSORS_ONLN"),
             sleep_time=10):
         self.job_kind = job_kind
         self.sleep_time = sleep_time
         self.do_job = job_func
 
-        self.cpu_avail = threads_num
+        self.cpu_avail = cpu_num
         self.cpus_per_job = {}  # job_id -> needed_cpus
         self.processes = []
+        self.threads_num = threads_num
 
         self.running = False
 
@@ -84,6 +89,12 @@ class Worker(object):
 
             if self.cpu_avail <= 0:
                 self.sleep()
+                logging.debug("No avalible CPU")
+                continue
+
+            if len(self.processes) >= self.threads_num:
+                self.sleep()
+                logging.debug("Number of proccesses {} reached limit {}".format(len(self.processes), self.threads_num))
                 continue
 
             try:

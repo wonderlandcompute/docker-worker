@@ -28,7 +28,7 @@ def do_docker_job(job, completion_event):
         stub = new_client()
         job.status = Job.COMPLETED
         stub.ModifyJob(job, timeout=5)
-        #completion_event.put()
+        completion_event.set()
 
         logger.debug("Finished")
     except BaseException as e:
@@ -49,7 +49,7 @@ def do_docker_job(job, completion_event):
 
         logger.error(str(e))
         logger.error(traceback.format_exc())
-        #completion_event.put()
+        completion_event.set()
         raise e
 
 

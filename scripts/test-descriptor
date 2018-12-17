@@ -3,10 +3,11 @@
 import json
 import signal
 import sys
+from dockerworker.worker import new_client
 from multiprocessing import Queue
 from time import time
 
-from dockerworker.worker.wonderland_pb2 import Job
+from dockerworker.worker.wonderland_pb2 import Job, RequestWithId
 from google.protobuf.json_format import Parse
 from lockfile import LockFile
 
@@ -34,11 +35,15 @@ def main():
     queue = Queue()
     job = Job()
     job.id = 2
+    job.kind = "docker-test"
 
     job.input = json.dumps(json.loads(open(sys.argv[1]).read()))
-
-    do_docker_job(job, queue)
+    stub = new_client()
+    id = stub.CreateJob(job)
+    id = stub.CreateJob(job)
+    #do_docker_job(job, queue)
     #Parse(queue.get(), job)
+    stub.GetJob(RequestWithId(id=job.id))
     print(job)
 
 

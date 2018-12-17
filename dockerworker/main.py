@@ -39,6 +39,7 @@ def main():
         "docker-test",
         do_docker_job,
         threads_num=config.THREADS_NUM,
+        cpu_num=config.CPU_NUM,
         sleep_time=config.SLEEP_TIME,
     )
 
