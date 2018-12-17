@@ -8,7 +8,7 @@ import grpc
 import numpy as np
 from hashlib import sha256
 
-from wonderlandClient.wonderland_pb2_grpc import WonderlandStub
+from .wonderland_pb2_grpc import WonderlandStub
 
 
 def new_client():

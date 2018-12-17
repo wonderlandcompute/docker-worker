@@ -20,6 +20,7 @@ setup(
         "PyYAML",
         "grpcio",
         "protobuf",
+        "numpy"
     ],
     scripts=[
         'scripts/test-descriptor'
