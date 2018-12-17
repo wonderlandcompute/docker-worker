@@ -17,7 +17,6 @@ setup(
         "hep-data-backends",
         "marshmallow",
         "protobuf",
-        "grpc",
         "PyYAML",
         "grpcio",
         "protobuf",
