@@ -1,25 +1,25 @@
-from docker import Client
+from docker import DockerClient
 
 from dockerworker.config import config
 from dockerworker.log import logger, capture_exception
 
-client = Client(base_url=config.DOCKER_URL, version=config.DOCKER_API_VERSION, timeout=config.DOCKER_TIMEOUT)
+client = DockerClient(base_url=config.DOCKER_URL, version=config.DOCKER_API_VERSION, timeout=config.DOCKER_TIMEOUT)
 
 
-def pull_image(image, *args, **kwargs):
+def pull_image(image, tag="latest", *args, **kwargs):
     logger.debug("Pulling image {}".format(image))
-    client.pull(image, *args, **kwargs)
+    client.images.pull(image, tag=tag, *args, **kwargs)
 
 
 def is_running(containter_id):
-    running_ids = [c['Id'] for c in client.containers()]
+    running_ids = [c.id for c in client.containers.list()]
     return containter_id in running_ids
 
 
 def create_container(image, **kwargs):
     logger.debug("Creating container for image {} with arguments: {}".format(image, kwargs))
-    c = client.create_container(image, **kwargs)
-    return c['Id']
+    c = client.containers.create(image, **kwargs)
+    return c.id
 
 
 def start_container(container_id, **kwargs):
@@ -27,7 +27,8 @@ def start_container(container_id, **kwargs):
     while attempts < config.DOCKER_START_ATTEMPTS:
         logger.debug("Trying to start container id={}".format(container_id))
         try:
-            client.start(container_id, **kwargs)
+            c = client.containers.get(container_id)
+            c.start(**kwargs)
             break
         except Exception as e:
             capture_exception()
@@ -42,21 +43,24 @@ def start_container(container_id, **kwargs):
 
 
 def logs(container_id, **kwargs):
-    return client.logs(container_id, **kwargs)
+    c = client.containers.get(container_id)
+    return c.logs(**kwargs)
 
 
 def remove(container_id, **kwargs):
-    return client.remove_container(container_id, **kwargs)
+    c = client.containers.get(container_id)
+    return c.remove(**kwargs)
 
 
 def REMOVE_ALL_CONTAINERS():
     "Use with caution"
     logger.debug("Killing and removing all containers!")
-    all_ids = [c['Id'] for c in client.containers(all=True)]
+    all_ids = [c.id for c in client.containers.list(all=True)]
     for container_id in all_ids:
-        for retries in xrange(20):
+        for retries in range(20):
             try:
-                client.remove_container(container_id, force=True)
+                c = client.containers.get(container_id)
+                c.remove(force=True)
                 break
             except:
                 capture_exception()

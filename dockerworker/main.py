@@ -1,12 +1,12 @@
 import signal
 import sys
 
-from .worker import Worker, new_client
+from dockerworker.worker import Worker, new_client
 from lockfile import LockFile
 
-from .config import config
-from .log import logger, capture_exception
-from .worker import do_docker_job
+from dockerworker.config import config
+from dockerworker.log import logger, capture_exception
+from dockerworker.worker import do_docker_job
 
 
 def break_lock():

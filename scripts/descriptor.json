@@ -6,6 +6,7 @@
     "container": {
         "workdir": "",
         "name": "busybox",
+        "tag": "latest",
         "cpu_needed": 1,
         "max_memoryMB": 1024,
         "min_memoryMB": 512,

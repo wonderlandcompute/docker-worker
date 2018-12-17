@@ -38,7 +38,7 @@ def main():
     job.input = json.dumps(json.loads(open(sys.argv[1]).read()))
 
     do_docker_job(job, queue)
-    Parse(queue.get(), job)
+    #Parse(queue.get(), job)
     print(job)
 
 

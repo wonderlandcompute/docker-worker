@@ -16,8 +16,8 @@ def create_workdir(job):
 
     os.mkdir(job_workdir)
 
-    #input_dir = os.path.join(job_workdir, "input")
-    input_dir = os.path.join(config.WORK_DIR, "input")
+    input_dir = os.path.join(job_workdir, "input")
+    #input_dir = os.path.join(config.WORK_DIR, "input")
     os.makedirs(input_dir, exist_ok=True)
 
     output_dir = os.path.join(job_workdir, "output")
@@ -47,10 +47,14 @@ def create_containers(job, in_dir, out_dir):
     needed = descriptor['container'].get('needed_containers', [])
     for i, container in enumerate(needed):
         image, volumes = container['name'], container['volumes']
+        repository = image.split(":")[0]
+        image_tag = ""
+        if len(image.split(":")) == 2:
+            image_tag = image.split(":")[1]
         assert isinstance(volumes, list)
 
         if not config.ONLY_LOCAL_IMAGES:
-            harbor.pull_image(image)
+            harbor.pull_image(repository, image_tag)
 
         tag = "JOB-{}-CNT-{}".format(job.id, i)
         mounted_names.append(tag)
@@ -66,7 +70,8 @@ def create_containers(job, in_dir, out_dir):
 
     # Execute environment container
     if not config.ONLY_LOCAL_IMAGES:
-        harbor.pull_image(descriptor['container']['name'])
+        harbor.pull_image(descriptor['container']['name'],
+                          descriptor['container']['tag'])
 
     command = util.build_command(job)
     logger.debug('Command to execute: {}'.format(command))
@@ -87,8 +92,8 @@ def create_containers(job, in_dir, out_dir):
 
     harbor.start_container(
         main_id,
-        volumes_from=mounted_names,
-        binds=volumes_list
+        #volumes_from=mounted_names,
+        #binds=volumes_list
     )
 
     return mounted_ids, main_id
