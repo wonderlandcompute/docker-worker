@@ -2,6 +2,7 @@ import os
 import sys
 import yaml
 import json
+import logging
 from pathlib import Path
 
 import grpc
@@ -10,16 +11,19 @@ from hashlib import sha256
 
 from .wonderland_pb2_grpc import WonderlandStub
 
+WONDERLAND_CLIENT_CONFIG="WONDERLAND_CLIENT_CONFIG"
 
-def new_client():
-    default_path = os.environ.get("WONDERCOMPUTECONFIG")
-    if default_path is None:
-        raise Exception("WONDERCOMPUTECONFIG environment variable wasn't set")
-    return new_client_from_path(default_path)
+def new_client(config_path="~/.wonder/config.yml", config={}):
+    if not os.environ.get(WONDERLAND_CLIENT_CONFIG):
+        logging.info("{} environment variable wasn't set".format(WONDERLAND_CLIENT_CONFIG))
+    else:
+        config_path = os.environ.get(WONDERLAND_CLIENT_CONFIG)
+    config = load_config(config_path, config)
+    logging.info(config)
+    return new_client_from_config(config)
 
 
-def new_client_from_path(config_path):
-    config = load_config(config_path)
+def new_client_from_config(config):
     creds = load_credentials(config)
     channel = grpc.secure_channel(
         config.get("connect_to"),
@@ -32,12 +36,26 @@ def new_client_from_path(config_path):
     return WonderlandStub(channel)
 
 
-def load_config(config_path):
-    if not os.path.exists(config_path):
-        raise Exception("Config file `{}` does not exist".format(config_path))
+def load_config(config_path="", config={}):
+    final_conf = {}
 
-    with open(config_path) as config_f:
-        return yaml.load(config_f)
+    assert config_path or config, "Set config path or config dict"
+
+    if config_path:
+        config_path = Path(config_path).expanduser()
+        if not config_path.exists():
+            raise Exception("Config file `{}` does not exist".format(config_path))
+
+        with config_path.open() as config_f:
+            final_conf = yaml.load(config_f)
+
+    if type(config) is dict:
+        final_conf.update(config)
+    else:
+        if config:
+            raise TypeError("config must be dictionary!")
+
+    return final_conf
 
 
 def load_credentials(config):
