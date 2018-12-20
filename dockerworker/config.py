@@ -1,10 +1,13 @@
 import imp
 import os
+import logging
 
 conf_file = os.environ.get('DOCKER_WORKER_CONFIG')
 
 if not conf_file:
-    raise Exception("Environment variable $DOCKER_WORKER_CONFIG is not set.")
+    logging.info("Environment variable $DOCKER_WORKER_CONFIG is not set.")
+else:
+    conf_file = "/etc/docker-worker.config"
 
 config = imp.new_module('config')
 config.__file__ = conf_file

@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='skygrid-docker-worker',
-    version='0.5.7',
-    url='https://github.com/skygrid/docker-worker',
-    author='Alexander Baranov',
+    version='0.7.0',
+    url='https://github.com/wonderlandcompute/docker-worker',
+    author='Alexander Baranov && Musinov Igor',
     author_email='sashab1@yandex-team.ru',
     packages=find_packages(),
     description='SkyGrid docker worker',
@@ -12,14 +12,12 @@ setup(
         "lockfile",
         "requests>=2.5.1",
         "docker",
-        #"six",
         "raven",
         "hep-data-backends",
         "marshmallow",
         "protobuf",
         "PyYAML",
         "grpcio",
-        "protobuf",
         "numpy"
     ],
     scripts=[
