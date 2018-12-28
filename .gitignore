@@ -71,3 +71,5 @@ docker-worker\.config
 config\.yml
 
 certs/
+
+\.aws/

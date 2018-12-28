@@ -15,9 +15,13 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.p
 
 COPY . /docker-worker
 COPY /certs/ /certs/
+COPY config.yml /config.yml
+COPY docker-worker.config /docker-worker.config
+RUN cp -R /docker-worker/.aws $HOME/.aws
+
 RUN pip install -r /docker-worker/requirements.txt && pip install /docker-worker
-ENV DOCKER_WORKER_CONFIG=/docker-worker/docker-worker.config \
-	WONDERLAND_CLIENT_CONFIG=/docker-worker/config.yml
+ENV DOCKER_WORKER_CONFIG=/docker-worker.config \
+	WONDERLAND_CLIENT_CONFIG=/config.yml
 
 ENTRYPOINT python3 /docker-worker/run.py
 

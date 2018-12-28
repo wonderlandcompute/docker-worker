@@ -1,6 +1,6 @@
 {
     "input": [
-        "local:/tmp/file.txt"
+        "local:/data/file.txt"
     ],
 
     "container": {
