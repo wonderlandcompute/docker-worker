@@ -42,8 +42,6 @@ def main():
     config = {"connect_to": "130.193.59.210:8090",
               "local_project_root": "~/repo-storage/test",
               "user": "imusinov",
-              "azurefs_acc_name": "mylake",
-              "azurefs_acc_key": "bMFX3wGXcp3eZCbxy9v0W0iUBco6gkF+j2EcZj8XKXndsLGZZ568ptKZQU0lCR4Sr5YmbqvME6Z7QQZgu9GUVQ==",
               "azurefs_share": "lake-share",
               "client_cert": "~/.wonder/credentials/imusinov.crt",
               "client_key": "~/.wonder/credentials/imusinov.key",

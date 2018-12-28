@@ -14,9 +14,12 @@ RUN apt-get install -y python3
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py
 
 COPY . /docker-worker
+COPY /certs/ /certs/
 RUN pip install -r /docker-worker/requirements.txt && pip install /docker-worker
 ENV DOCKER_WORKER_CONFIG=/docker-worker/docker-worker.config \
 	WONDERLAND_CLIENT_CONFIG=/docker-worker/config.yml
+
+ENTRYPOINT python3 /docker-worker/run.py
 
 
 

@@ -7,3 +7,7 @@ push-image:
 
 run-image:
 	docker run  -v /var/run/docker.sock:/var/run/docker.sock -it registry.gitlab.com/lambda-hse/registry/dockerworker
+
+debug-container:
+	docker run  -v /var/run/docker.sock:/var/run/docker.sock -it --entrypoint='' registry.gitlab.com/lambda-hse/registry/dockerworker
+
