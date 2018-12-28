@@ -13,12 +13,15 @@ setup(
         "requests>=2.5.1",
         "docker",
         "raven",
-        "hep-data-backends",
         "marshmallow",
         "protobuf",
         "PyYAML",
         "grpcio",
+        "google",
         "numpy"
+    ],
+    dependency_links=[
+      'git+ssh://git@github.com/wonderlandcompute/hep-data-backends.git#egg=hep-data-backends',
     ],
     scripts=[
         'scripts/test-descriptor'

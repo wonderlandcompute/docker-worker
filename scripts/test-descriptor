@@ -32,17 +32,29 @@ def main():
     break_lock()
     signal.signal(signal.SIGQUIT, sigquit_handler)
     assert len(sys.argv) == 2, "input file is needed"
-    queue = Queue()
-    job = Job()
-    job.id = 2
-    job.kind = "docker-test"
 
-    job.input = json.dumps(json.loads(open(sys.argv[1]).read()))
-    stub = new_client()
-    id = stub.CreateJob(job)
-    id = stub.CreateJob(job)
-    #do_docker_job(job, queue)
-    #Parse(queue.get(), job)
+    job = Job()
+    job.kind = "docker-test"
+    with open("descriptor.json") as f:
+        job_data = json.load(f)
+    job.input = json.dumps(job_data)
+
+    config = {"connect_to": "130.193.59.210:8090",
+              "local_project_root": "~/repo-storage/test",
+              "user": "imusinov",
+              "azurefs_acc_name": "mylake",
+              "azurefs_acc_key": "bMFX3wGXcp3eZCbxy9v0W0iUBco6gkF+j2EcZj8XKXndsLGZZ568ptKZQU0lCR4Sr5YmbqvME6Z7QQZgu9GUVQ==",
+              "azurefs_share": "lake-share",
+              "client_cert": "~/.wonder/credentials/imusinov.crt",
+              "client_key": "~/.wonder/credentials/imusinov.key",
+              "ca_cert": "~/.wonder/credentials/wonderland.crt",
+              "max_msg_size_megabytes": 515,
+              }
+    stub = new_client(config=config)
+    job = stub.CreateJob(job)
+    # queue = Queue()
+    # do_docker_job(job, queue)
+    # Parse(queue.get(), job)
     stub.GetJob(RequestWithId(id=job.id))
     print(job)
 

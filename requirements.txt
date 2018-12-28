@@ -1,0 +1,11 @@
+lockfile
+requests>=2.5.1
+docker
+raven
+marshmallow
+protobuf
+PyYAML
+grpcio
+google
+numpy
+git+https://github.com/wonderlandcompute/hep-data-backends.git#egg=hep-data-backends
